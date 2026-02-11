@@ -21,7 +21,7 @@ export default function App() {
   return (
     <div className="relative h-screen w-screen bg-black overflow-hidden fixed inset-0 font-sans" dir="rtl">
       
-      {/* الهيدر العلوي */}
+      {/* هيدر التطبيق */}
       <div className="fixed top-0 left-0 w-full h-[70px] bg-[#0c0c16] flex items-center justify-around z-[999999] border-b-2 border-red-600 shadow-2xl">
         <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center p-2">
           <Home size={22} className="text-red-500" />
@@ -46,7 +46,7 @@ export default function App() {
 
       <div className="absolute top-[70px] left-0 w-full h-[calc(100vh-70px)] bg-black overflow-hidden">
         
-        {/* الـ iframe بدون sandbox لضمان عمل المشغل 100% */}
+        {/* الـ iframe مع Sandbox ذكي جداً */}
         <iframe
           ref={iframeRef}
           src={url}
@@ -56,22 +56,19 @@ export default function App() {
             marginBottom: '-450px' 
           }}
           referrerPolicy="no-referrer"
+          /* السر في هذا السطر: 
+             allow-popups-to-escape-sandbox: يحل مشكلة المشغل.
+             إزالة allow-top-navigation: تقتل الروابط الخارجية وتمنعها من تغيير صفحة التطبيق.
+          */
+          sandbox="allow-forms allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox"
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
           allowFullScreen
         />
 
-        {/* --- نظام الدروع الذكي لتعطيل الروابط الخارجية --- */}
-        
-        {/* 1. درع الحواف (يمين ويسار): يمنع النقر على الإعلانات الجانبية وروابط التليجرام العائمة */}
-        <div className="absolute top-0 left-0 w-[45px] h-full z-[999] bg-transparent pointer-events-auto"></div>
-        <div className="absolute top-0 right-0 w-[45px] h-full z-[999] bg-transparent pointer-events-auto"></div>
-
-        {/* 2. درع سفلي ضخم: يغطي الفوتر بالكامل حيث توجد روابطهم الخارجية وقنواتهم */}
-        <div className="absolute bottom-0 left-0 w-full h-[120px] z-[999] bg-transparent pointer-events-auto"></div>
-
-        {/* 3. درع المنطقة العلوية (تحت الهيدر مباشرة): لمنع النقر على أزرار تسجيل الدخول أو الروابط العلوية */}
-        <div className="absolute top-0 left-0 w-full h-[40px] z-[999] bg-transparent pointer-events-auto"></div>
-
+        {/* دروع حماية إضافية للنقرات العشوائية في الزوايا */}
+        <div className="absolute top-0 left-0 w-[40px] h-full z-[999] bg-transparent pointer-events-auto"></div>
+        <div className="absolute top-0 right-0 w-[40px] h-full z-[999] bg-transparent pointer-events-auto"></div>
+        <div className="absolute bottom-0 left-0 w-full h-[100px] z-[999] bg-transparent pointer-events-auto"></div>
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
