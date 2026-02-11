@@ -19,67 +19,57 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative h-screen w-screen bg-black overflow-hidden fixed inset-0" dir="rtl">
+    <div className="relative h-screen w-screen bg-black overflow-hidden fixed inset-0 font-sans" dir="rtl">
       
-      {/* هيدر التطبيق - منطقة آمنة وموثوقة */}
+      {/* هيدر التطبيق */}
       <div className="fixed top-0 left-0 w-full h-[70px] bg-[#0c0c16] flex items-center justify-around z-[999999] border-b-2 border-red-600 shadow-2xl">
-        <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center p-2 active:scale-90 transition-transform">
+        <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center p-2">
           <Home size={22} className="text-red-500" />
-          <span className="text-[10px] mt-1 font-bold">الرئيسية</span>
+          <span className="text-[10px] mt-1 font-bold italic">الرئيسية</span>
         </button>
 
         <button onClick={handleRefresh} className="text-gray-300 flex flex-col items-center p-2">
           <RefreshCw size={22} className="text-green-500" />
-          <span className="text-[10px] mt-1 font-bold">تحديث</span>
+          <span className="text-[10px] mt-1 font-bold italic">تحديث</span>
         </button>
 
-        <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-gray-300 flex flex-col items-center p-2">
+        <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-gray-300 flex flex-col items-center p-2 animate-pulse">
           <Send size={22} className="text-blue-400" />
-          <span className="text-[10px] mt-1 font-bold">قناتنا</span>
+          <span className="text-[10px] mt-1 font-bold italic">قناتنا</span>
         </a>
 
         <button onClick={() => navigator.share({ url: window.location.href })} className="text-gray-300 flex flex-col items-center p-2">
           <Share2 size={22} className="text-purple-500" />
-          <span className="text-[10px] mt-1 font-bold">مشاركة</span>
+          <span className="text-[10px] mt-1 font-bold italic">مشاركة</span>
         </button>
       </div>
 
-      {/* منطقة المحتوى مع نظام الدروع الواقية */}
       <div className="absolute top-[70px] left-0 w-full h-[calc(100vh-70px)] bg-black overflow-hidden">
         
-        {/* الـ Iframe: محصور بين هوامش لقص الروابط الخارجية في الأطراف */}
         <iframe
           ref={iframeRef}
           src={url}
-          className="w-full h-[145%] border-none"
+          className="w-full h-[150%] border-none"
           style={{ 
-            marginTop: '-275px', // قص الهيدر الأصلي
-            marginBottom: '-400px', // قص الفوتر والروابط السفلية
-            width: '102%', // تكبير طفيف لقص الروابط الجانبية
-            marginLeft: '-1%' 
+            marginTop: '-275px', 
+            marginBottom: '-400px' 
           }}
           referrerPolicy="no-referrer"
+          /* التعديل الجوهري هنا: 
+             قمنا بإعادة الـ sandbox ولكن بدون allow-top-navigation و بدون allow-popups
+             هذا سيجعل الروابط الخارجية "ميتة" ولا تستجيب عند الضغط عليها
+          */
+          sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"
           allow="autoplay; fullscreen; encrypted-media"
           allowFullScreen
         />
 
-        {/* --- دروع الحماية (أهم جزء لإخفاء الروابط برمجياً) --- */}
-        
-        {/* 1. درع علوي (خلف الهيدر) لمنع الوصول لأي روابط قريبة من الأعلى */}
-        <div className="absolute top-0 left-0 w-full h-4 z-[999] bg-transparent pointer-events-auto"></div>
-
-        {/* 2. دروع جانبية لمنع الضغط على إعلانات "السكاي سكريبر" أو أزرار التواصل الجانبية */}
-        <div className="absolute top-0 left-0 w-4 h-full z-[999] bg-transparent pointer-events-auto"></div>
-        <div className="absolute top-0 right-0 w-4 h-full z-[999] bg-transparent pointer-events-auto"></div>
-
-        {/* 3. درع سفلي ضخم يغطي منطقة "حقوق الملكية" وروابط تليجرام/فيسبوك الخاصة بالموقع */}
-        <div className="absolute bottom-0 left-0 w-full h-[80px] z-[999] bg-transparent pointer-events-auto"></div>
-
+        {/* طبقة حماية إضافية للأطراف */}
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none border-[15px] border-transparent z-[999]"></div>
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        body, html { overscroll-behavior: none; background: black; }
-        /* إخفاء السكرول بار لضمان عدم خروج المستخدم عن المسار */
+        body, html { overscroll-behavior: none; background: black; margin: 0; }
         ::-webkit-scrollbar { display: none; }
       `}} />
     </div>
