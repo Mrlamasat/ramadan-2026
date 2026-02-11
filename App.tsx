@@ -64,15 +64,15 @@ interface BrowserFrameProps {
 
 const BrowserFrame = forwardRef<HTMLIFrameElement, BrowserFrameProps>(({ url }, ref) => {
   // 1. القيمة الافتراضية عند أول تشغيل (جرب -300 لتعرف الفرق)
-  const [marginTop, setMarginTop] = useState(-300); 
+  const [marginTop, setMarginTop] = useState(-250); 
   const loadCount = useRef(0);
 
   const handleLoad = () => {
     // 2. القيمة التي يتم تطبيقها بعد تحميل الصفحة (وهي الأهم)
     if (loadCount.current === 0 || url.includes('category.php')) {
-      setMarginTop(-300); // اجعلها متطابقة مع القيمة العلوية
+      setMarginTop(-250); // اجعلها متطابقة مع القيمة العلوية
     } else {
-      setMarginTop(-80); // هذه لصفحة المشاهدة المباشرة، تقليلها يرفع المحتوى لأسفل
+      setMarginTop(-50); // هذه لصفحة المشاهدة المباشرة، تقليلها يرفع المحتوى لأسفل
     }
     loadCount.current += 1;
   };
