@@ -63,7 +63,7 @@ interface BrowserFrameProps {
 }
 
 const BrowserFrame = forwardRef<HTMLIFrameElement, BrowserFrameProps>(({ url }, ref) => {
-  const [marginTop, setMarginTop] = useState(-350);
+  const [marginTop, setMarginTop] = useState(-330);
   const loadCount = useRef(0);
 
   const handleLoad = () => {
