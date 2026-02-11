@@ -8,73 +8,58 @@ export default function App() {
   const [url, setUrl] = useState(BASE_URL);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const handleRefresh = useCallback(() => {
-    if (iframeRef.current) {
-      iframeRef.current.src = iframeRef.current.src;
-    }
-  }, []);
+  const handleRefresh = () => {
+    if (iframeRef.current) iframeRef.current.src = iframeRef.current.src;
+  };
 
   return (
-    <div className="relative h-screen w-screen bg-black overflow-hidden fixed inset-0 font-sans" dir="rtl">
+    <div className="relative h-screen w-screen bg-black overflow-hidden" dir="rtl">
       
-      {/* الهيدر العلوي الخاص بك */}
-      <div className="fixed top-0 left-0 w-full h-[70px] bg-[#0c0c16] flex items-center justify-around z-[999999] border-b-2 border-red-600 shadow-2xl">
+      {/* الهيدر العلوي */}
+      <div className="fixed top-0 left-0 w-full h-[65px] bg-[#0c0c16] flex items-center justify-around z-[50] border-b border-red-600/30 shadow-xl">
         <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center">
-          <Home size={22} className="text-red-500" />
-          <span className="text-[10px] mt-1 font-bold">الرئيسية</span>
+          <Home size={20} className="text-red-500" />
+          <span className="text-[10px] mt-1">الرئيسية</span>
         </button>
-
         <button onClick={handleRefresh} className="text-gray-300 flex flex-col items-center">
-          <RefreshCw size={22} className="text-green-500" />
-          <span className="text-[10px] mt-1 font-bold">تحديث</span>
+          <RefreshCw size={20} className="text-green-500" />
+          <span className="text-[10px] mt-1">تحديث</span>
         </button>
-
-        <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-white flex flex-col items-center">
-          <Send size={22} className="text-blue-400" />
-          <span className="text-[10px] mt-1 font-bold">قناتنا</span>
+        <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-gray-300 flex flex-col items-center">
+          <Send size={20} className="text-blue-400" />
+          <span className="text-[10px] mt-1">قناتنا</span>
         </a>
-
-        <button onClick={() => navigator.share({ url: window.location.href })} className="text-gray-300 flex flex-col items-center">
-          <Share2 size={22} className="text-purple-500" />
-          <span className="text-[10px] mt-1 font-bold">مشاركة</span>
+        <button onClick={() => navigator.share({url: window.location.href})} className="text-gray-300 flex flex-col items-center">
+          <Share2 size={20} className="text-purple-500" />
+          <span className="text-[10px] mt-1">مشاركة</span>
         </button>
       </div>
 
-      {/* منطقة عرض المحتوى */}
-      <div className="absolute top-[70px] left-0 w-full h-[calc(100vh-70px)] bg-black overflow-hidden">
-        
-        {/* الـ iframe: قمنا بضبط الارتفاع بدقة لقص الأزرار السفلية */}
-        <iframe
-          ref={iframeRef}
-          src={url}
-          className="w-full border-none"
-          style={{ 
-            marginTop: '-275px', // قص الهيدر الأصلي
-            height: 'calc(100% + 200px)', // الارتفاع يسمح برؤية المشغل فقط
-            marginBottom: '-500px' // قص الأزرار السفلية (تليجرام ويوتيوب الموقع)
-          }}
-          referrerPolicy="no-referrer"
-          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-          allowFullScreen
-        />
-
-        {/* --- الدرع الواقي السفلي (السدادة) --- */}
-        {/* هذه الطبقة تغطي منطقة أزرار تليجرام ويوتيوب الموقع الأصلي تماماً */}
-        <div 
-          className="absolute bottom-0 left-0 w-full h-[150px] bg-black z-[9999] flex items-center justify-center border-t border-red-600/20"
-          style={{ pointerEvents: 'auto' }}
-        >
-          <p className="text-gray-500 text-[10px] italic">مشاهدة ممتعة عبر تطبيقنا الرسمي</p>
+      {/* منطقة المحتوى - الحل الذكي في التنسيق */}
+      <div className="absolute top-[65px] left-0 w-full h-[calc(100vh-65px)] bg-black overflow-y-auto overflow-x-hidden">
+        <div className="relative w-full" style={{ height: '2000px' }}> {/* طول افتراضي كبير للسماح بالتمرير الداخلي */}
+          <iframe
+            ref={iframeRef}
+            src={url}
+            className="absolute top-0 left-0 w-full h-full border-none"
+            style={{ 
+              marginTop: '-275px', // إخفاء الهيدر الأصلي
+              clipPath: 'inset(275px 0px 150px 0px)' // السحر هنا: قص الجزء العلوي والسفلي برمجياً من حواف الرندر
+            }}
+            referrerPolicy="no-referrer"
+            allow="autoplay; fullscreen; encrypted-media"
+            allowFullScreen
+          />
         </div>
-
-        {/* دروع جانبية إضافية */}
-        <div className="absolute top-0 right-0 w-[40px] h-full z-[9998] bg-transparent pointer-events-auto"></div>
-        <div className="absolute top-0 left-0 w-[40px] h-full z-[9998] bg-transparent pointer-events-auto"></div>
       </div>
 
+      {/* حماية منبثقة بسيطة: تمنع التفاعل مع الروابط التي تحاول الخروج من الإطار */}
       <style dangerouslySetInnerHTML={{ __html: `
-        body, html { overscroll-behavior: none; background: black; margin: 0; }
-        ::-webkit-scrollbar { display: none; }
+        iframe {
+            pointer-events: auto;
+        }
+        /* منع أي نقرات خارج منطقة المشغل إذا كانت تحاول فتح نوافذ جديدة */
+        [window-target="_blank"] { pointer-events: none !important; }
       `}} />
     </div>
   );
