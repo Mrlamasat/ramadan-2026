@@ -63,19 +63,38 @@ interface BrowserFrameProps {
 }
 
 const BrowserFrame = forwardRef<HTMLIFrameElement, BrowserFrameProps>(({ url }, ref) => {
-  const [marginTop, setMarginTop] = useState(-330);
+  // 1. القيمة الافتراضية عند أول تشغيل (جرب -300 لتعرف الفرق)
+  const [marginTop, setMarginTop] = useState(-300); 
   const loadCount = useRef(0);
 
   const handleLoad = () => {
-    // إخفاء القوائم العلوية المزعجة من الموقع الأصلي
+    // 2. القيمة التي يتم تطبيقها بعد تحميل الصفحة (وهي الأهم)
     if (loadCount.current === 0 || url.includes('category.php')) {
-      setMarginTop(-360);
+      setMarginTop(-300); // اجعلها متطابقة مع القيمة العلوية
     } else {
-      setMarginTop(-110);
+      setMarginTop(-80); // هذه لصفحة المشاهدة المباشرة، تقليلها يرفع المحتوى لأسفل
     }
     loadCount.current += 1;
   };
 
+  return (
+    <div className="absolute top-[75px] left-0 w-full h-[calc(100vh-75px)] overflow-hidden bg-black">
+      <iframe
+        ref={ref}
+        src={url}
+        onLoad={handleLoad}
+        className="w-full border-none transition-opacity duration-700"
+        style={{
+          marginTop: `${marginTop}px`,
+          // نزيد الارتفاع لتعويض النقص
+          height: `calc(100% + ${Math.abs(marginTop)}px + 400px)`, 
+        }}
+        sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"
+        allowFullScreen
+      />
+    </div>
+  );
+});
   return (
     <div className="absolute top-[75px] left-0 w-full h-[calc(100vh-75px)] overflow-hidden bg-black">
       <iframe
