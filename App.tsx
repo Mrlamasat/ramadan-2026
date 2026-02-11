@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, forwardRef, useEffect } from 'rea
 import { Home, RefreshCw, Send, Share2 } from 'lucide-react';
 
 const TG_URL = "https://t.me/RamadanSeries26";
-const HOME_URL = "https://z.larooza.life/category.php?cat=ramadan-2026";
+const HOME_URL = "https://v.larooza.life/category.php?cat=ramadan-2026";
 
 // --- Header Component ---
 interface HeaderProps {
@@ -63,22 +63,23 @@ interface BrowserFrameProps {
 }
 
 const BrowserFrame = forwardRef<HTMLIFrameElement, BrowserFrameProps>(({ url }, ref) => {
-  // 1. القيمة الافتراضية عند أول تشغيل (جرب -300 لتعرف الفرق)
-  const [marginTop, setMarginTop] = useState(-250); 
+  // تم تقليل القيم هنا لإنزال الصفحة لأسفل
+  const [marginTop, setMarginTop] = useState(-280); 
   const loadCount = useRef(0);
 
   const handleLoad = () => {
-    // 2. القيمة التي يتم تطبيقها بعد تحميل الصفحة (وهي الأهم)
+    // التحكم في الإزاحة عند التحميل لضمان عدم ارتفاع المحتوى
     if (loadCount.current === 0 || url.includes('category.php')) {
-      setMarginTop(-250); // اجعلها متطابقة مع القيمة العلوية
+      setMarginTop(-280); 
     } else {
-      setMarginTop(-50); // هذه لصفحة المشاهدة المباشرة، تقليلها يرفع المحتوى لأسفل
+      setMarginTop(-60); // محاذاة أفضل لصفحة الفيديو المباشر
     }
     loadCount.current += 1;
   };
 
   return (
-    <div className="absolute top-[75px] left-0 w-full h-[calc(100vh-75px)] overflow-hidden bg-black">
+    // أضفنا padding-top (pt-[60px]) لضمان نزول الـ iframe بالكامل
+    <div className="absolute top-[75px] left-0 w-full h-[calc(100vh-75px)] overflow-hidden bg-black pt-[60px]">
       <iframe
         ref={ref}
         src={url}
@@ -86,25 +87,7 @@ const BrowserFrame = forwardRef<HTMLIFrameElement, BrowserFrameProps>(({ url }, 
         className="w-full border-none transition-opacity duration-700"
         style={{
           marginTop: `${marginTop}px`,
-          // نزيد الارتفاع لتعويض النقص
-          height: `calc(100% + ${Math.abs(marginTop)}px + 400px)`, 
-        }}
-        sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"
-        allowFullScreen
-      />
-    </div>
-  );
-});
-  return (
-    <div className="absolute top-[75px] left-0 w-full h-[calc(100vh-75px)] overflow-hidden bg-black">
-      <iframe
-        ref={ref}
-        src={url}
-        onLoad={handleLoad}
-        className="w-full border-none transition-opacity duration-700"
-        style={{
-          marginTop: `${marginTop}px`,
-          height: `calc(100% + ${Math.abs(marginTop)}px + 300px)`,
+          height: `calc(100% + ${Math.abs(marginTop)}px + 400px)`,
         }}
         sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"
         allowFullScreen
