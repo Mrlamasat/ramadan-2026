@@ -69,7 +69,7 @@ const BrowserFrame = forwardRef<HTMLIFrameElement, BrowserFrameProps>(({ url }, 
   const handleLoad = () => {
     // إخفاء القوائم العلوية المزعجة من الموقع الأصلي
     if (loadCount.current === 0 || url.includes('category.php')) {
-      setMarginTop(-380);
+      setMarginTop(-360);
     } else {
       setMarginTop(-110);
     }
