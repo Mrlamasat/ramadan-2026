@@ -1,0 +1,1 @@
+// This component has been moved to App.tsx
