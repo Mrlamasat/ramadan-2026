@@ -1,148 +1,47 @@
-import React, { useState, useRef, useCallback, forwardRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback, forwardRef } from 'react';
 import { Home, RefreshCw, Send, Share2 } from 'lucide-react';
 
 const TG_URL = "https://t.me/RamadanSeries26";
 const HOME_URL = "https://v.larooza.life/category.php?cat=ramadan-2026";
 
-// --- Header Component ---
-interface HeaderProps {
-  onHome: () => void;
-  onRefresh: () => void;
-  onShare: () => void;
-  telegramUrl: string;
-}
-
-const Header: React.FC<HeaderProps> = ({ onHome, onRefresh, onShare, telegramUrl }) => {
-  return (
-    <div className="fixed top-0 left-0 w-full h-[75px] header-glass flex items-center justify-around px-4 z-[999999]">
-      
-      {/* زر الرئيسية */}
-      <button 
-        onClick={onHome}
-        className="prominent-btn flex flex-col items-center justify-center bg-white/10 hover:bg-white/20 text-white w-[75px] h-[55px] rounded-2xl"
-      >
-        <Home size={22} className="text-[#e94560]" />
-        <span className="text-[11px] font-bold mt-1">الرئيسية</span>
-      </button>
-
-      {/* زر تحديث */}
-      <button 
-        onClick={onRefresh}
-        className="prominent-btn flex flex-col items-center justify-center bg-red-500/10 hover:bg-red-500/20 text-red-400 w-[75px] h-[55px] rounded-2xl border-red-500/30"
-      >
-        <RefreshCw size={22} />
-        <span className="text-[11px] font-bold mt-1">تحديث</span>
-      </button>
-
-      {/* زر مشاركة */}
-      <button 
-        onClick={(e) => { e.preventDefault(); onShare(); }}
-        className="prominent-btn flex flex-col items-center justify-center bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 w-[75px] h-[55px] rounded-2xl border-purple-500/30"
-      >
-        <Share2 size={22} />
-        <span className="text-[11px] font-bold mt-1">مشاركة</span>
-      </button>
-
-      {/* زر تليجرام */}
-      <a 
-        href={telegramUrl} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="prominent-btn animate-pulse-blue flex flex-col items-center justify-center bg-[#0088cc]/20 hover:bg-[#0088cc]/30 text-[#0088cc] w-[75px] h-[55px] rounded-2xl border-[#0088cc]/30"
-      >
-        <Send size={22} />
-        <span className="text-[11px] font-bold mt-1">تليجرام</span>
-      </a>
-    </div>
-  );
-};
-
-// --- Browser Frame Component ---
-interface BrowserFrameProps {
-  url: string;
-}
-
-const BrowserFrame = forwardRef<HTMLIFrameElement, BrowserFrameProps>(({ url }, ref) => {
-  // تم تقليل القيم هنا لإنزال الصفحة لأسفل
-  const [marginTop, setMarginTop] = useState(-280); 
-  const loadCount = useRef(0);
-
-  const handleLoad = () => {
-    // التحكم في الإزاحة عند التحميل لضمان عدم ارتفاع المحتوى
-    if (loadCount.current === 0 || url.includes('category.php')) {
-      setMarginTop(-280); 
-    } else {
-      setMarginTop(-60); // محاذاة أفضل لصفحة الفيديو المباشر
-    }
-    loadCount.current += 1;
-  };
-
-  return (
-    // أضفنا padding-top (pt-[60px]) لضمان نزول الـ iframe بالكامل
-    <div className="absolute top-[75px] left-0 w-full h-[calc(100vh-75px)] overflow-hidden bg-black pt-[60px]">
-      <iframe
-        ref={ref}
-        src={url}
-        onLoad={handleLoad}
-        className="w-full border-none transition-opacity duration-700"
-        style={{
-          marginTop: `${marginTop}px`,
-          height: `calc(100% + ${Math.abs(marginTop)}px + 400px)`,
-        }}
-        sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"
-        allowFullScreen
-      />
-    </div>
-  );
-});
-
-// --- Main App ---
 export default function App() {
   const [url, setUrl] = useState(HOME_URL);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const handleHome = useCallback(() => {
-    setUrl(`${HOME_URL}&cache_bust=${Date.now()}`);
-  }, []);
+  const handleRefresh = () => {
+    if (iframeRef.current) iframeRef.current.src = iframeRef.current.src;
+  };
 
-  const handleRefresh = useCallback(() => {
-    if (iframeRef.current) {
-      iframeRef.current.src = iframeRef.current.src;
-    }
-  }, []);
-
-  const handleShare = useCallback(async () => {
-    const shareData = {
-      title: 'تطبيق مسلسلات رمضان 2026',
-      text: 'شاهد مسلسلات رمضان حصرياً وبأعلى جودة عبر هذا التطبيق!',
-      url: window.location.href
-    };
-    
+  const handleShare = async () => {
     try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        alert('تم نسخ رابط التطبيق بنجاح! شاركه الآن مع أصدقائك.');
-      }
+      await navigator.share({ title: 'مسلسلات رمضان', url: window.location.href });
     } catch (err) {
-      console.log('Sharing failed or cancelled');
+      navigator.clipboard.writeText(window.location.href);
+      alert('تم نسخ الرابط');
     }
-  }, []);
+  };
 
   return (
-    <div className="relative h-screen w-screen bg-[#05050a] overflow-hidden">
-      <Header 
-        onHome={handleHome} 
-        onRefresh={handleRefresh}
-        onShare={handleShare}
-        telegramUrl={TG_URL}
-      />
-      
-      <BrowserFrame 
-        ref={iframeRef}
-        url={url} 
-      />
+    <div className="relative h-screen w-screen bg-black overflow-hidden">
+      {/* الشريط العلوي */}
+      <div className="fixed top-0 left-0 w-full h-[70px] bg-[#0a0a14] flex items-center justify-around z-[9999] border-b border-red-500/30">
+        <button onClick={() => setUrl(`${HOME_URL}&t=${Date.now()}`)} className="text-white flex flex-col items-center"><Home size={20}/><span className="text-[10px]">الرئيسية</span></button>
+        <button onClick={handleRefresh} className="text-red-400 flex flex-col items-center"><RefreshCw size={20}/><span className="text-[10px]">تحديث</span></button>
+        <button onClick={handleShare} className="text-purple-400 flex flex-col items-center"><Share2 size={20}/><span className="text-[10px]">مشاركة</span></button>
+        <a href={TG_URL} target="_blank" className="text-blue-400 flex flex-col items-center"><Send size={20}/><span className="text-[10px]">تليجرام</span></a>
+      </div>
+
+      {/* حاوية الموقع */}
+      <div className="absolute top-[70px] left-0 w-full h-[calc(100vh-70px)] overflow-hidden">
+        <iframe
+          ref={iframeRef}
+          src={url}
+          className="w-full h-[150%] border-none"
+          style={{ marginTop: '-250px' }} // هذا السطر هو المسؤول عن المحاذاة
+          sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"
+          allowFullScreen
+        />
+      </div>
     </div>
   );
 }
