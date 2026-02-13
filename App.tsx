@@ -53,7 +53,7 @@ export default function App() {
   return (
     <div ref={appContainerRef} className="relative h-screen w-screen bg-black overflow-hidden" dir="rtl">
       
-      {/* هيدر تطبيقك (يختفي عند التكبير) */}
+      {/* الهيدر العلوي */}
       <header className={`fixed top-0 left-0 w-full h-[65px] bg-[#0c0c16] flex items-center justify-between px-8 z-[100] border-b border-red-600/40 transition-transform duration-500 ${isMaximized ? '-translate-y-full' : 'translate-y-0'}`}>
         <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
           <Home size={22} className="text-red-500" />
@@ -82,9 +82,9 @@ export default function App() {
             className="border-none transition-all duration-700"
             style={isMaximized ? {
               width: '100%',
-              height: '180%', // جعل الطول أكبر من الشاشة لإخفاء الهيدر بالأسفل
-              marginTop: '-15%', // رفع الإطار للأعلى لإخفاء هيدر لاروزا الأصلي
-              transform: 'scale(1.1)', // عمل زوم بسيط لضمان ملء الجوانب
+              height: '180%',
+              marginTop: '-15%',
+              transform: 'scale(1.1)',
               transformOrigin: 'top center'
             } : {
               width: '102%',
@@ -100,26 +100,27 @@ export default function App() {
           />
         </div>
 
-        {/* الأزرار العائمة */}
-        <div className={`absolute left-0 w-full flex justify-between items-center px-6 z-[500] pointer-events-none transition-all duration-700 ${isMaximized ? 'bottom-10' : 'bottom-24'}`}>
-          <div className="flex gap-4">
+        {/* الأزرار العائمة - نظام تحول المربعات الممركزة */}
+        <div className={`absolute left-0 w-full flex items-center z-[500] pointer-events-none transition-all duration-700 ${isMaximized ? 'bottom-10 justify-center gap-2' : 'bottom-24 justify-between px-6'}`}>
+          
+          <div className={`flex transition-all duration-700 ${isMaximized ? 'gap-2' : 'gap-4'}`}>
             <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" 
-               className={`pointer-events-auto flex items-center justify-center bg-[#25D366] text-white rounded-full shadow-lg transition-all ${isMaximized ? 'w-10 h-10 opacity-30 hover:opacity-100' : 'w-14 h-14'}`}>
+               className={`pointer-events-auto flex items-center justify-center bg-[#25D366] text-white shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-12 h-10 rounded-lg opacity-40 hover:opacity-100' : 'w-14 h-14 rounded-full'}`}>
               <MessageCircle size={isMaximized ? 20 : 28} />
             </a>
             <a href={MY_TG_URL} target="_blank" rel="noreferrer" 
-               className={`pointer-events-auto flex items-center justify-center bg-[#229ED9] text-white rounded-full shadow-lg transition-all ${isMaximized ? 'w-10 h-10 opacity-30 hover:opacity-100' : 'w-14 h-14'}`}>
+               className={`pointer-events-auto flex items-center justify-center bg-[#229ED9] text-white shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-12 h-10 rounded-lg opacity-40 hover:opacity-100' : 'w-14 h-14 rounded-full'}`}>
               <Send size={isMaximized ? 20 : 28} />
             </a>
           </div>
 
-          <div className="flex gap-4">
+          <div className={`flex transition-all duration-700 ${isMaximized ? 'gap-2' : 'gap-4'}`}>
             <a href={TIKTOK_URL} target="_blank" rel="noreferrer" 
-               className={`pointer-events-auto flex items-center justify-center bg-black border border-white/20 text-white rounded-full shadow-lg transition-all ${isMaximized ? 'w-10 h-10 opacity-30 hover:opacity-100' : 'w-14 h-14'}`}>
+               className={`pointer-events-auto flex items-center justify-center bg-black border border-white/20 text-white shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-12 h-10 rounded-lg opacity-40 hover:opacity-100' : 'w-14 h-14 rounded-full'}`}>
               <TikTokIcon className={isMaximized ? 'w-5 h-5' : 'w-7 h-7'} />
             </a>
             <button onClick={toggleFullscreen} 
-               className={`pointer-events-auto flex items-center justify-center bg-yellow-500 text-black rounded-full shadow-2xl transition-all ${isMaximized ? 'w-10 h-10' : 'w-14 h-14 animate-bounce-slow'}`}>
+               className={`pointer-events-auto flex items-center justify-center bg-yellow-500 text-black shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-12 h-10 rounded-lg' : 'w-14 h-14 rounded-full animate-bounce-slow'}`}>
               {isMaximized ? <Minimize size={20} /> : <Maximize size={28} />}
             </button>
           </div>
