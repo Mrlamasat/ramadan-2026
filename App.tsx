@@ -19,71 +19,62 @@ export default function App() {
   const appContainerRef = useRef<HTMLDivElement>(null);
 
   const handleRefresh = () => {
-    if (iframeRef.current) iframeRef.current.src = iframeRef.current.src;
+    if (iframeRef.current) {
+        // تحديث الإطار بدون تغيير الحالة العامة للرابط
+        iframeRef.current.src = iframeRef.current.src;
+    }
   };
 
   const toggleFullscreen = async () => {
     if (!isMaximized) {
-      // دخول Fullscreen إن كان متاح
       if (appContainerRef.current?.requestFullscreen) {
         try { await appContainerRef.current.requestFullscreen(); } catch {}
       }
-
-      // طلب تدوير الشاشة Landscape
-      if (screen.orientation && screen.orientation.lock) {
-        try { await screen.orientation.lock('landscape'); } catch {}
-      }
-
-      // رفع iframe لإخفاء الهيدر الأصلي
-      setUrl(BASE_URL + "&minimal=1"); // إذا كان الموقع يدعم نسخة minimal
+      // لاحظ هنا: لم نعد نغير قيمة الـ url إطلاقاً
       setIsMaximized(true);
     } else {
-      // الخروج من fullscreen
       if (document.exitFullscreen) {
         try { await document.exitFullscreen(); } catch {}
       }
-
-      if (screen.orientation && screen.orientation.unlock) {
-        try { screen.orientation.unlock(); } catch {}
-      }
-
-      setUrl(BASE_URL); // ارجع النسخة العادية
       setIsMaximized(false);
     }
   };
 
   return (
-    <div ref={appContainerRef} className="relative w-screen h-screen bg-black" dir="rtl">
+    <div ref={appContainerRef} className="relative w-screen h-screen bg-black overflow-hidden" dir="rtl">
 
-      {/* الهيدر الخاص بالتطبيق يبقى ظاهر دائمًا */}
-      <header className="fixed top-0 left-0 w-full h-[65px] bg-[#0c0c16] flex items-center justify-between px-8 z-[100] border-b border-red-600/40">
-        <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
-          <Home size={22} className="text-red-500" />
-          <span className="text-[9px] mt-1 font-bold">الرئيسية</span>
-        </button>
-        <button onClick={handleRefresh} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
-          <RefreshCw size={22} className="text-green-500" />
-          <span className="text-[9px] mt-1 font-bold">تحديث</span>
-        </button>
-        <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-white flex flex-col items-center active:scale-90 no-underline">
-          <Send size={22} className="text-blue-400" />
-          <span className="text-[9px] mt-1 font-bold">قناتنا</span>
-        </a>
-        <button onClick={() => navigator.share?.({url: window.location.href})} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
-          <Share2 size={22} className="text-purple-500" />
-          <span className="text-[9px] mt-1 font-bold">مشاركة</span>
-        </button>
-      </header>
+      {/* الهيدر الخاص بك - يختفي فقط في وضع التكبير لتوفير مساحة أكبر للفيديو */}
+      {!isMaximized && (
+        <header className="fixed top-0 left-0 w-full h-[65px] bg-[#0c0c16] flex items-center justify-between px-8 z-[100] border-b border-red-600/40">
+          <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
+            <Home size={22} className="text-red-500" />
+            <span className="text-[9px] mt-1 font-bold">الرئيسية</span>
+          </button>
+          <button onClick={handleRefresh} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
+            <RefreshCw size={22} className="text-green-500" />
+            <span className="text-[9px] mt-1 font-bold">تحديث</span>
+          </button>
+          <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-white flex flex-col items-center active:scale-90 no-underline">
+            <Send size={22} className="text-blue-400" />
+            <span className="text-[9px] mt-1 font-bold">قناتنا</span>
+          </a>
+          <button onClick={() => navigator.share?.({url: window.location.href})} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
+            <Share2 size={22} className="text-purple-500" />
+            <span className="text-[9px] mt-1 font-bold">مشاركة</span>
+          </button>
+        </header>
+      )}
 
-      {/* iframe مع رفع لإخفاء الهيدر الأصلي */}
-      <main className={`w-full h-full mt-[65px] overflow-hidden transition-all duration-500`}>
+      {/* منطقة العرض الرئيسية */}
+      <main className={`w-full h-full transition-all duration-500 ${!isMaximized ? 'mt-[65px]' : 'mt-0'}`}>
         <iframe
           ref={iframeRef}
           src={url}
           className="border-none w-full transition-all duration-500"
           style={{
-            height: isMaximized ? '120%' : '150%',
-            marginTop: isMaximized ? '-65px' : '-80px',
+            // عند التكبير نزيد الطول ونرفع الهيدر الأصلي للأعلى (قيمة -110px تقريبية للشريط المتوسط)
+            height: isMaximized ? 'calc(100% + 110px)' : 'calc(100% + 80px)',
+            marginTop: isMaximized ? '-110px' : '-80px',
           }}
           referrerPolicy="no-referrer"
           allow="autoplay; fullscreen"
@@ -93,21 +84,21 @@ export default function App() {
       </main>
 
       {/* الأزرار العائمة */}
-      <div className={`fixed left-0 w-full flex justify-center gap-4 z-[500] transition-all duration-500 bottom-4`}>
+      <div className="fixed left-0 w-full flex justify-center gap-4 z-[500] bottom-4">
         <a href={WHATSAPP_URL} target="_blank" rel="noreferrer"
-           className="flex items-center justify-center bg-[#25D366] text-white shadow-lg w-14 h-14 rounded-full transition-transform duration-300 hover:scale-110 active:scale-90">
+           className="flex items-center justify-center bg-[#25D366] text-white shadow-lg w-14 h-14 rounded-full transition-transform hover:scale-110 active:scale-90">
           <MessageCircle size={28} />
         </a>
         <a href={MY_TG_URL} target="_blank" rel="noreferrer"
-           className="flex items-center justify-center bg-[#229ED9] text-white shadow-lg w-14 h-14 rounded-full transition-transform duration-300 hover:scale-110 active:scale-90">
+           className="flex items-center justify-center bg-[#229ED9] text-white shadow-lg w-14 h-14 rounded-full transition-transform hover:scale-110 active:scale-90">
           <Send size={28} />
         </a>
         <a href={TIKTOK_URL} target="_blank" rel="noreferrer"
-           className="flex items-center justify-center bg-black border border-white/20 text-white shadow-lg w-14 h-14 rounded-full transition-transform duration-300 hover:scale-110 active:scale-90">
+           className="flex items-center justify-center bg-black border border-white/20 text-white shadow-lg w-14 h-14 rounded-full transition-transform hover:scale-110 active:scale-90">
           <TikTokIcon className="w-7 h-7" />
         </a>
         <button onClick={toggleFullscreen}
-           className="flex items-center justify-center bg-yellow-500 text-black shadow-2xl w-14 h-14 rounded-full transition-transform duration-300 hover:scale-110 active:scale-90">
+           className="flex items-center justify-center bg-yellow-500 text-black shadow-2xl w-14 h-14 rounded-full transition-transform hover:scale-110 active:scale-90">
           {isMaximized ? <Minimize size={28} /> : <Maximize size={28} />}
         </button>
       </div>
