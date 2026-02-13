@@ -38,11 +38,11 @@ export default function App() {
       
       {/* الهيدر العلوي */}
       <header className={`fixed top-0 left-0 w-full h-[65px] bg-[#0c0c16] flex items-center justify-between px-8 z-[100] border-b border-red-600/40 transition-transform duration-500 ${isMaximized ? '-translate-y-full' : 'translate-y-0'}`}>
-        <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center active:scale-90">
+        <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
           <Home size={22} className="text-red-500" />
           <span className="text-[9px] mt-1 font-bold">الرئيسية</span>
         </button>
-        <button onClick={handleRefresh} className="text-gray-300 flex flex-col items-center active:scale-90">
+        <button onClick={handleRefresh} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
           <RefreshCw size={22} className="text-green-500" />
           <span className="text-[9px] mt-1 font-bold">تحديث</span>
         </button>
@@ -50,7 +50,7 @@ export default function App() {
           <Send size={22} className="text-blue-400" />
           <span className="text-[9px] mt-1 font-bold">قناتنا</span>
         </a>
-        <button onClick={() => navigator.share?.({url: window.location.href})} className="text-gray-300 flex flex-col items-center active:scale-90">
+        <button onClick={() => navigator.share?.({url: window.location.href})} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
           <Share2 size={22} className="text-purple-500" />
           <span className="text-[9px] mt-1 font-bold">مشاركة</span>
         </button>
@@ -75,35 +75,35 @@ export default function App() {
           />
         </div>
 
-        {/* أزرار التواصل (بدون أسماء) متوزعة على الجانبين */}
-        <div className={`absolute left-0 w-full flex justify-between items-center px-6 z-[500] pointer-events-none transition-all duration-700 ${isMaximized ? 'bottom-8' : 'bottom-24'}`}>
+        {/* الأزرار العائمة - حافظنا على الارتفاع الجمالي عند التكبير */}
+        <div className={`absolute left-0 w-full flex justify-between items-center px-6 z-[500] pointer-events-none transition-all duration-700 ${isMaximized ? 'bottom-24' : 'bottom-24'}`}>
           
           {/* الجانب الأيمن: واتساب وتليجرام */}
           <div className="flex gap-4">
             <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" 
-               className={`pointer-events-auto flex items-center justify-center bg-[#25D366] text-white rounded-full shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-11 h-11 opacity-60' : 'w-14 h-14'}`}>
-              <MessageCircle size={isMaximized ? 22 : 28} />
+               className={`pointer-events-auto flex items-center justify-center bg-[#25D366] text-white rounded-full shadow-[0_0_15px_rgba(37,211,102,0.4)] transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-12 h-12 opacity-80' : 'w-14 h-14'}`}>
+              <MessageCircle size={isMaximized ? 24 : 28} />
             </a>
             <a href={MY_TG_URL} target="_blank" rel="noreferrer" 
-               className={`pointer-events-auto flex items-center justify-center bg-[#229ED9] text-white rounded-full shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-11 h-11 opacity-60' : 'w-14 h-14'}`}>
-              <Send size={isMaximized ? 22 : 28} />
+               className={`pointer-events-auto flex items-center justify-center bg-[#229ED9] text-white rounded-full shadow-[0_0_15px_rgba(34,158,217,0.4)] transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-12 h-12 opacity-80' : 'w-14 h-14'}`}>
+              <Send size={isMaximized ? 24 : 28} />
             </a>
           </div>
 
           {/* الجانب الأيسر: تيك توك وتكبير الشاشة */}
           <div className="flex gap-4">
             <a href={TIKTOK_URL} target="_blank" rel="noreferrer" 
-               className={`pointer-events-auto flex items-center justify-center bg-black border border-white/20 text-white rounded-full shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-11 h-11 opacity-60' : 'w-14 h-14'}`}>
-              <TikTokIcon className={isMaximized ? 'w-5 h-5' : 'w-7 h-7'} />
+               className={`pointer-events-auto flex items-center justify-center bg-black border border-white/20 text-white rounded-full shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-12 h-12 opacity-80' : 'w-14 h-14'}`}>
+              <TikTokIcon className={isMaximized ? 'w-6 h-6' : 'w-7 h-7'} />
             </a>
             <button onClick={() => setIsMaximized(!isMaximized)} 
-               className={`pointer-events-auto flex items-center justify-center bg-yellow-500 text-black rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-11 h-11' : 'w-14 h-14 animate-bounce-slow'}`}>
-              {isMaximized ? <Minimize size={22} /> : <Maximize size={28} />}
+               className={`pointer-events-auto flex items-center justify-center bg-yellow-500 text-black rounded-full shadow-[0_0_20px_rgba(234,179,8,0.5)] transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-12 h-12' : 'w-14 h-14 animate-bounce-slow'}`}>
+              {isMaximized ? <Minimize size={24} /> : <Maximize size={28} />}
             </button>
           </div>
         </div>
 
-        {/* طبقة حماية اللمس */}
+        {/* طبقة حماية اللمس - تظهر فقط في الوضع العادي لمنع الإعلانات */}
         {!isMaximized && <div className="absolute bottom-0 left-0 w-full h-[120px] bg-transparent z-[99] pointer-events-auto"></div>}
       </main>
 
