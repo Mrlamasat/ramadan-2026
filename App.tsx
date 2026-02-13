@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Home, RefreshCw, Send, Share2, MessageCircle, Maximize } from 'lucide-react';
+import { Home, RefreshCw, Send, Share2, MessageCircle, Maximize, Minimize } from 'lucide-react';
 
 const MY_TG_URL = "https://t.me/RamadanSeries26";
 const TIKTOK_URL = "https://www.tiktok.com/@1118.8111?_r=1&_t=ZG-93qhRpdxK5Y";
@@ -14,63 +14,46 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 
 export default function App() {
   const [url, setUrl] = useState(BASE_URL);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [isMaximized, setIsMaximized] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const handleRefresh = () => {
     if (iframeRef.current) iframeRef.current.src = iframeRef.current.src;
   };
 
-  // وظيفة التكبير الاحترافية
-  const toggleFullscreen = () => {
-    if (containerRef.current) {
-      if (!document.fullscreenElement) {
-        containerRef.current.requestFullscreen().catch(err => {
-          alert(`خطأ في التكبير: ${err.message}`);
-        });
-      } else {
-        document.exitFullscreen();
-      }
-    }
-  };
-
   return (
     <div className="relative h-screen w-screen bg-[#050505] overflow-hidden" dir="rtl">
       
-      {/* هيدر التطبيق */}
-      <div className="fixed top-0 left-0 w-full h-[65px] bg-[#0c0c16] flex items-center justify-around z-[100] border-b border-red-600/40 shadow-2xl">
-        <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center active:scale-95 transition-all outline-none">
+      {/* هيدر التطبيق - يختفي عند التكبير لتوسيع الرؤية */}
+      <div className={`fixed top-0 left-0 w-full h-[65px] bg-[#0c0c16] flex items-center justify-around z-[100] border-b border-red-600/40 shadow-2xl transition-all duration-500 ${isMaximized ? '-top-[70px]' : 'top-0'}`}>
+        <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center active:scale-95">
           <Home size={20} className="text-red-500" />
           <span className="text-[10px] mt-1 font-bold">الرئيسية</span>
         </button>
-        <button onClick={handleRefresh} className="text-gray-300 flex flex-col items-center active:scale-95 transition-all outline-none">
+        <button onClick={handleRefresh} className="text-gray-300 flex flex-col items-center active:scale-95">
           <RefreshCw size={20} className="text-green-500" />
           <span className="text-[10px] mt-1 font-bold">تحديث</span>
         </button>
-        
-        {/* زر تكبير احترافي جديد في الهيدر */}
-        <button onClick={toggleFullscreen} className="text-gray-300 flex flex-col items-center active:scale-95 transition-all outline-none">
-          <Maximize size={20} className="text-yellow-500" />
-          <span className="text-[10px] mt-1 font-bold">ملء الشاشة</span>
-        </button>
-
-        <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-white flex flex-col items-center active:scale-95 transition-all no-underline">
+        <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-white flex flex-col items-center active:scale-95">
           <Send size={20} className="text-blue-400" />
           <span className="text-[10px] mt-1 font-bold">قناتنا</span>
         </a>
+        <button onClick={() => navigator.share?.({url: window.location.href})} className="text-gray-300 flex flex-col items-center active:scale-95">
+          <Share2 size={20} className="text-purple-500" />
+          <span className="text-[10px] mt-1 font-bold">مشاركة</span>
+        </button>
       </div>
 
-      {/* حاوية العرض التي سيتم تكبيرها */}
-      <div ref={containerRef} className="absolute top-[65px] left-0 w-full h-[calc(100vh-65px)] bg-black overflow-hidden">
+      <div className={`absolute left-0 w-full bg-black overflow-hidden transition-all duration-500 ${isMaximized ? 'top-0 h-screen' : 'top-[65px] h-[calc(100vh-65px)]'}`}>
         <div className="w-full h-full overflow-hidden">
           <iframe
             ref={iframeRef}
             src={url}
             className="w-[102%] h-[150%] border-none"
             style={{ 
-              marginTop: '-275px', 
+              marginTop: isMaximized ? '-220px' : '-275px', 
               marginLeft: '-1%', 
-              transform: 'scale(1.02)', 
+              transform: isMaximized ? 'scale(1.05)' : 'scale(1.02)', 
               transformOrigin: 'top center'
             }}
             referrerPolicy="no-referrer"
@@ -79,44 +62,45 @@ export default function App() {
           />
         </div>
 
-        {/* الأزرار العائمة المتحركة */}
-        <div className="absolute bottom-28 left-0 w-full flex justify-center items-center gap-4 z-[500] pointer-events-none px-4">
+        {/* مجموعة أزرار التواصل + زر التكبير/التصغير */}
+        <div className={`absolute left-0 w-full flex justify-center items-center gap-3 z-[500] pointer-events-none px-4 transition-all duration-500 ${isMaximized ? 'bottom-4' : 'bottom-28'}`}>
+          
+          {/* زر واتساب */}
           <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" 
-             className="pointer-events-auto flex items-center gap-3 bg-[#25D366] text-white px-6 py-4 rounded-full font-black shadow-[0_0_20px_rgba(37,211,102,0.6)] hover:scale-110 active:scale-90 transition-all animate-bounce-slow no-underline">
-            <MessageCircle size={24} />
-            <span className="text-sm">واتساب</span>
+             className={`pointer-events-auto flex items-center justify-center bg-[#25D366] text-white rounded-full font-black shadow-lg transition-all duration-500 ${isMaximized ? 'p-2 w-10 h-10' : 'px-5 py-3.5 gap-2'}`}>
+            <MessageCircle size={isMaximized ? 20 : 22} />
+            {!isMaximized && <span className="text-sm">واتساب</span>}
           </a>
 
+          {/* زر تيك توك */}
           <a href={TIKTOK_URL} target="_blank" rel="noreferrer" 
-             className="pointer-events-auto flex items-center gap-3 bg-[#000000] border border-white/30 text-white px-6 py-4 rounded-full font-black shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-110 active:scale-90 transition-all animate-bounce-slow no-underline" 
-             style={{ animationDelay: '0.2s' }}>
-            <TikTokIcon className="w-6 h-6" />
-            <span className="text-sm">تيك توك</span>
+             className={`pointer-events-auto flex items-center justify-center bg-black border border-white/30 text-white rounded-full font-black shadow-lg transition-all duration-500 ${isMaximized ? 'p-2 w-10 h-10' : 'px-5 py-3.5 gap-2'}`}>
+            <TikTokIcon className={isMaximized ? 'w-5 h-5' : 'w-5 h-5'} />
+            {!isMaximized && <span className="text-sm">تيك توك</span>}
           </a>
 
+          {/* زر التكبير والتصغير (المطلوب) */}
+          <button onClick={() => setIsMaximized(!isMaximized)} 
+             className={`pointer-events-auto flex items-center justify-center bg-yellow-500 text-black rounded-full font-black shadow-xl animate-pulse transition-all duration-500 ${isMaximized ? 'p-2 w-10 h-10' : 'px-5 py-3.5 gap-2'}`}>
+            {isMaximized ? <Minimize size={22} /> : <Maximize size={22} />}
+            {!isMaximized && <span className="text-sm font-bold">تكبير</span>}
+          </button>
+
+          {/* زر تليجرام */}
           <a href={MY_TG_URL} target="_blank" rel="noreferrer" 
-             className="pointer-events-auto flex items-center gap-3 bg-[#229ED9] text-white px-6 py-4 rounded-full font-black shadow-[0_0_20px_rgba(34,158,217,0.6)] hover:scale-110 active:scale-90 transition-all animate-bounce-slow no-underline" 
-             style={{ animationDelay: '0.4s' }}>
-            <Send size={24} />
-            <span className="text-sm">تليجرام</span>
+             className={`pointer-events-auto flex items-center justify-center bg-[#229ED9] text-white rounded-full font-black shadow-lg transition-all duration-500 ${isMaximized ? 'p-2 w-10 h-10' : 'px-5 py-3.5 gap-2'}`}>
+            <Send size={isMaximized ? 20 : 22} />
+            {!isMaximized && <span className="text-sm">تليجرام</span>}
           </a>
         </div>
 
-        {/* طبقة حماية لمسية */}
-        <div className="absolute bottom-0 left-0 w-full h-[140px] bg-transparent z-[99] pointer-events-auto"></div>
+        {/* طبقة حماية - تختفي عند التكبير للسماح بالتحكم الكامل في الفيديو */}
+        {!isMaximized && <div className="absolute bottom-0 left-0 w-full h-[140px] bg-transparent z-[99] pointer-events-auto"></div>}
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
-        }
-        .animate-bounce-slow {
-          animation: bounce-slow 3s infinite ease-in-out;
-        }
-        /* إخفاء الهيدر عند وضع ملء الشاشة */
-        :fullscreen # هيدر التطبيق { display: none; }
         iframe { pointer-events: auto !important; }
+        .no-underline { text-decoration: none; }
       `}} />
     </div>
   );
