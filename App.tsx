@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Home, RefreshCw, Send, Share2, MessageCircle } from 'lucide-react';
+import { Home, RefreshCw, Send, Share2, MessageCircle, Maximize } from 'lucide-react';
 
 const MY_TG_URL = "https://t.me/RamadanSeries26";
 const TIKTOK_URL = "https://www.tiktok.com/@1118.8111?_r=1&_t=ZG-93qhRpdxK5Y";
@@ -14,10 +14,24 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 
 export default function App() {
   const [url, setUrl] = useState(BASE_URL);
+  const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const handleRefresh = () => {
     if (iframeRef.current) iframeRef.current.src = iframeRef.current.src;
+  };
+
+  // وظيفة التكبير الاحترافية
+  const toggleFullscreen = () => {
+    if (containerRef.current) {
+      if (!document.fullscreenElement) {
+        containerRef.current.requestFullscreen().catch(err => {
+          alert(`خطأ في التكبير: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
   };
 
   return (
@@ -33,17 +47,21 @@ export default function App() {
           <RefreshCw size={20} className="text-green-500" />
           <span className="text-[10px] mt-1 font-bold">تحديث</span>
         </button>
-        <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-white flex flex-col items-center active:scale-95 transition-all">
+        
+        {/* زر تكبير احترافي جديد في الهيدر */}
+        <button onClick={toggleFullscreen} className="text-gray-300 flex flex-col items-center active:scale-95 transition-all outline-none">
+          <Maximize size={20} className="text-yellow-500" />
+          <span className="text-[10px] mt-1 font-bold">ملء الشاشة</span>
+        </button>
+
+        <a href={MY_TG_URL} target="_blank" rel="noreferrer" className="text-white flex flex-col items-center active:scale-95 transition-all no-underline">
           <Send size={20} className="text-blue-400" />
           <span className="text-[10px] mt-1 font-bold">قناتنا</span>
         </a>
-        <button onClick={() => navigator.share?.({url: window.location.href})} className="text-gray-300 flex flex-col items-center active:scale-95 transition-all outline-none">
-          <Share2 size={20} className="text-purple-500" />
-          <span className="text-[10px] mt-1 font-bold">مشاركة</span>
-        </button>
       </div>
 
-      <div className="absolute top-[65px] left-0 w-full h-[calc(100vh-65px)] bg-black overflow-hidden">
+      {/* حاوية العرض التي سيتم تكبيرها */}
+      <div ref={containerRef} className="absolute top-[65px] left-0 w-full h-[calc(100vh-65px)] bg-black overflow-hidden">
         <div className="w-full h-full overflow-hidden">
           <iframe
             ref={iframeRef}
@@ -56,41 +74,35 @@ export default function App() {
               transformOrigin: 'top center'
             }}
             referrerPolicy="no-referrer"
-            
-            /* التعديل الجوهري لتفعيل ملء الشاشة */
-            allow="autoplay; fullscreen; picture-in-picture"
-            // @ts-ignore (لتجاوز تنبيهات TypeScript)
-            webkitallowfullscreen="true"
-            // @ts-ignore
-            mozallowfullscreen="true"
-            allowFullScreen={true}
+            allow="autoplay; fullscreen"
+            allowFullScreen
           />
         </div>
 
         {/* الأزرار العائمة المتحركة */}
         <div className="absolute bottom-28 left-0 w-full flex justify-center items-center gap-4 z-[500] pointer-events-none px-4">
           <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" 
-             className="pointer-events-auto flex items-center gap-3 bg-[#25D366] text-white px-6 py-4 rounded-full font-black shadow-[0_0_20px_rgba(37,211,102,0.6)] hover:scale-110 active:scale-90 transition-all animate-bounce-slow">
+             className="pointer-events-auto flex items-center gap-3 bg-[#25D366] text-white px-6 py-4 rounded-full font-black shadow-[0_0_20px_rgba(37,211,102,0.6)] hover:scale-110 active:scale-90 transition-all animate-bounce-slow no-underline">
             <MessageCircle size={24} />
             <span className="text-sm">واتساب</span>
           </a>
 
           <a href={TIKTOK_URL} target="_blank" rel="noreferrer" 
-             className="pointer-events-auto flex items-center gap-3 bg-[#000000] border border-white/30 text-white px-6 py-4 rounded-full font-black shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-110 active:scale-90 transition-all animate-bounce-slow" 
+             className="pointer-events-auto flex items-center gap-3 bg-[#000000] border border-white/30 text-white px-6 py-4 rounded-full font-black shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-110 active:scale-90 transition-all animate-bounce-slow no-underline" 
              style={{ animationDelay: '0.2s' }}>
             <TikTokIcon className="w-6 h-6" />
             <span className="text-sm">تيك توك</span>
           </a>
 
           <a href={MY_TG_URL} target="_blank" rel="noreferrer" 
-             className="pointer-events-auto flex items-center gap-3 bg-[#229ED9] text-white px-6 py-4 rounded-full font-black shadow-[0_0_20px_rgba(34,158,217,0.6)] hover:scale-110 active:scale-90 transition-all animate-bounce-slow" 
+             className="pointer-events-auto flex items-center gap-3 bg-[#229ED9] text-white px-6 py-4 rounded-full font-black shadow-[0_0_20px_rgba(34,158,217,0.6)] hover:scale-110 active:scale-90 transition-all animate-bounce-slow no-underline" 
              style={{ animationDelay: '0.4s' }}>
             <Send size={24} />
             <span className="text-sm">تليجرام</span>
           </a>
         </div>
 
-        {/* طبقة حماية لمسية شفافة */}
+        {/* طبقة حماية لمسية */}
         <div className="absolute bottom-0 left-0 w-full h-[140px] bg-transparent z-[99] pointer-events-auto"></div>
       </div>
 
@@ -102,6 +114,8 @@ export default function App() {
         .animate-bounce-slow {
           animation: bounce-slow 3s infinite ease-in-out;
         }
+        /* إخفاء الهيدر عند وضع ملء الشاشة */
+        :fullscreen # هيدر التطبيق { display: none; }
         iframe { pointer-events: auto !important; }
       `}} />
     </div>
