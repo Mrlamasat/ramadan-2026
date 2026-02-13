@@ -13,22 +13,49 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 export default function App() {
-  const [url, setUrl] = useState(BASE_URL);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [url, setUrl] = useState(BASE_URL);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const appContainerRef = useRef<HTMLDivElement>(null);
 
   const handleRefresh = () => {
     if (iframeRef.current) iframeRef.current.src = iframeRef.current.src;
   };
 
-  const toggleFullscreen = () => {
-    setIsMaximized(prev => !prev);
+  const toggleFullscreen = async () => {
+    if (!isMaximized) {
+      // دخول Fullscreen إن كان متاح
+      if (appContainerRef.current?.requestFullscreen) {
+        try { await appContainerRef.current.requestFullscreen(); } catch {}
+      }
+
+      // طلب تدوير الشاشة Landscape
+      if (screen.orientation && screen.orientation.lock) {
+        try { await screen.orientation.lock('landscape'); } catch {}
+      }
+
+      // رفع iframe لإخفاء الهيدر الأصلي
+      setUrl(BASE_URL + "&minimal=1"); // إذا كان الموقع يدعم نسخة minimal
+      setIsMaximized(true);
+    } else {
+      // الخروج من fullscreen
+      if (document.exitFullscreen) {
+        try { await document.exitFullscreen(); } catch {}
+      }
+
+      if (screen.orientation && screen.orientation.unlock) {
+        try { screen.orientation.unlock(); } catch {}
+      }
+
+      setUrl(BASE_URL); // ارجع النسخة العادية
+      setIsMaximized(false);
+    }
   };
 
   return (
-    <div className="relative w-screen h-screen bg-black" dir="rtl">
+    <div ref={appContainerRef} className="relative w-screen h-screen bg-black" dir="rtl">
 
-      {/* الهيدر الخاص بالتطبيق يبقى دائمًا */}
+      {/* الهيدر الخاص بالتطبيق يبقى ظاهر دائمًا */}
       <header className="fixed top-0 left-0 w-full h-[65px] bg-[#0c0c16] flex items-center justify-between px-8 z-[100] border-b border-red-600/40">
         <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
           <Home size={22} className="text-red-500" />
@@ -48,15 +75,15 @@ export default function App() {
         </button>
       </header>
 
-      {/* iframe مع قص الهيدر الأصلي */}
+      {/* iframe مع رفع لإخفاء الهيدر الأصلي */}
       <main className={`w-full h-full mt-[65px] overflow-hidden transition-all duration-500`}>
         <iframe
           ref={iframeRef}
           src={url}
           className="border-none w-full transition-all duration-500"
           style={{
-            height: isMaximized ? '120%' : '150%', // رفع المحتوى لإخفاء الهيدر الأصلي
-            marginTop: isMaximized ? '-65px' : '-80px', // يرفع الصفحة لإخفاء الهيدر الأصلي
+            height: isMaximized ? '120%' : '150%',
+            marginTop: isMaximized ? '-65px' : '-80px',
           }}
           referrerPolicy="no-referrer"
           allow="autoplay; fullscreen"
