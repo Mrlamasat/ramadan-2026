@@ -22,14 +22,12 @@ export default function App() {
     if (iframeRef.current) iframeRef.current.src = iframeRef.current.src;
   };
 
-  // وظيفة التكبير لملء الشاشة بالكامل
   const toggleFullscreen = async () => {
     if (!isMaximized) {
       if (appContainerRef.current?.requestFullscreen) {
         await appContainerRef.current.requestFullscreen();
       }
       setIsMaximized(true);
-      // محاولة قلب الشاشة تلقائياً
       if (screen.orientation && screen.orientation.lock) {
         screen.orientation.lock('landscape').catch(() => {});
       }
@@ -44,12 +42,9 @@ export default function App() {
     }
   };
 
-  // مراقبة تغيير وضع ملء الشاشة (في حال ضغط المستخدم زر الرجوع في الهاتف)
   useEffect(() => {
     const handleFullscreenChange = () => {
-      if (!document.fullscreenElement) {
-        setIsMaximized(false);
-      }
+      if (!document.fullscreenElement) setIsMaximized(false);
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
@@ -58,7 +53,7 @@ export default function App() {
   return (
     <div ref={appContainerRef} className="relative h-screen w-screen bg-black overflow-hidden" dir="rtl">
       
-      {/* الهيدر العلوي - يختفي تماماً عند التكبير */}
+      {/* هيدر تطبيقك (يختفي عند التكبير) */}
       <header className={`fixed top-0 left-0 w-full h-[65px] bg-[#0c0c16] flex items-center justify-between px-8 z-[100] border-b border-red-600/40 transition-transform duration-500 ${isMaximized ? '-translate-y-full' : 'translate-y-0'}`}>
         <button onClick={() => setUrl(`${BASE_URL}&v=${Date.now()}`)} className="text-gray-300 flex flex-col items-center active:scale-90 outline-none">
           <Home size={22} className="text-red-500" />
@@ -78,19 +73,27 @@ export default function App() {
         </button>
       </header>
 
-      {/* منطقة المشغل - تتوسع لتشغل 100% من الشاشة عند التكبير */}
+      {/* منطقة المشغل */}
       <main className={`relative w-full transition-all duration-700 ${isMaximized ? 'h-screen' : 'h-[calc(100vh-65px)] mt-[65px]'}`}>
         <div className="w-full h-full overflow-hidden bg-black">
           <iframe
             ref={iframeRef}
             src={url}
-            className={`transition-all duration-700 border-none ${isMaximized ? 'w-full h-full scale-100 mt-0 ml-0' : 'w-[102%] h-[150%]'}`}
-            style={!isMaximized ? { 
-              marginTop: '-275px', 
-              marginLeft: '-1%', 
-              transform: 'scale(1.02)', 
+            className="border-none transition-all duration-700"
+            style={isMaximized ? {
+              width: '100%',
+              height: '180%', // جعل الطول أكبر من الشاشة لإخفاء الهيدر بالأسفل
+              marginTop: '-15%', // رفع الإطار للأعلى لإخفاء هيدر لاروزا الأصلي
+              transform: 'scale(1.1)', // عمل زوم بسيط لضمان ملء الجوانب
               transformOrigin: 'top center'
-            } : {}}
+            } : {
+              width: '102%',
+              height: '150%',
+              marginTop: '-275px',
+              marginLeft: '-1%',
+              transform: 'scale(1.02)',
+              transformOrigin: 'top center'
+            }}
             referrerPolicy="no-referrer"
             allow="autoplay; fullscreen"
             allowFullScreen
@@ -99,46 +102,36 @@ export default function App() {
 
         {/* الأزرار العائمة */}
         <div className={`absolute left-0 w-full flex justify-between items-center px-6 z-[500] pointer-events-none transition-all duration-700 ${isMaximized ? 'bottom-10' : 'bottom-24'}`}>
-          
           <div className="flex gap-4">
             <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" 
-               className={`pointer-events-auto flex items-center justify-center bg-[#25D366] text-white rounded-full shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-10 h-10 opacity-40 hover:opacity-100' : 'w-14 h-14'}`}>
+               className={`pointer-events-auto flex items-center justify-center bg-[#25D366] text-white rounded-full shadow-lg transition-all ${isMaximized ? 'w-10 h-10 opacity-30 hover:opacity-100' : 'w-14 h-14'}`}>
               <MessageCircle size={isMaximized ? 20 : 28} />
             </a>
             <a href={MY_TG_URL} target="_blank" rel="noreferrer" 
-               className={`pointer-events-auto flex items-center justify-center bg-[#229ED9] text-white rounded-full shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-10 h-10 opacity-40 hover:opacity-100' : 'w-14 h-14'}`}>
+               className={`pointer-events-auto flex items-center justify-center bg-[#229ED9] text-white rounded-full shadow-lg transition-all ${isMaximized ? 'w-10 h-10 opacity-30 hover:opacity-100' : 'w-14 h-14'}`}>
               <Send size={isMaximized ? 20 : 28} />
             </a>
           </div>
 
           <div className="flex gap-4">
             <a href={TIKTOK_URL} target="_blank" rel="noreferrer" 
-               className={`pointer-events-auto flex items-center justify-center bg-black border border-white/20 text-white rounded-full shadow-lg transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-10 h-10 opacity-40 hover:opacity-100' : 'w-14 h-14'}`}>
+               className={`pointer-events-auto flex items-center justify-center bg-black border border-white/20 text-white rounded-full shadow-lg transition-all ${isMaximized ? 'w-10 h-10 opacity-30 hover:opacity-100' : 'w-14 h-14'}`}>
               <TikTokIcon className={isMaximized ? 'w-5 h-5' : 'w-7 h-7'} />
             </a>
             <button onClick={toggleFullscreen} 
-               className={`pointer-events-auto flex items-center justify-center bg-yellow-500 text-black rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMaximized ? 'w-10 h-10' : 'w-14 h-14 animate-bounce-slow'}`}>
+               className={`pointer-events-auto flex items-center justify-center bg-yellow-500 text-black rounded-full shadow-2xl transition-all ${isMaximized ? 'w-10 h-10' : 'w-14 h-14 animate-bounce-slow'}`}>
               {isMaximized ? <Minimize size={20} /> : <Maximize size={28} />}
             </button>
           </div>
         </div>
 
-        {/* طبقة حماية اللمس - تظهر فقط في الوضع العادي */}
         {!isMaximized && <div className="absolute bottom-0 left-0 w-full h-[120px] bg-transparent z-[99] pointer-events-auto"></div>}
       </main>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
-        .animate-bounce-slow {
-          animation: bounce-slow 3s infinite ease-in-out;
-        }
-        /* إخفاء شريط التمرير في وضع ملء الشاشة */
-        :fullscreen { width: 100vw; height: 100vh; }
+        @keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .animate-bounce-slow { animation: bounce-slow 3s infinite ease-in-out; }
         iframe { pointer-events: auto !important; }
-        a { text-decoration: none !important; }
       `}} />
     </div>
   );
